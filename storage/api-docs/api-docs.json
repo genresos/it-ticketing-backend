@@ -1,0 +1,122 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Adyawinsa App API Documentation",
+        "description": "Adyawinsa App API Documentation",
+        "termsOfService": "http://adyawinsa.com/",
+        "contact": {
+            "email": "adw.app@adyawinsa.com"
+        },
+        "license": {
+            "name": "PT. Adyawinsa Telecommunication & Electrical",
+            "url": "http://adyawinsa.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/ca": {
+            "get": {
+                "tags": [
+                    "ca"
+                ],
+                "summary": "Returns a Sample API response",
+                "description": "A sample login to test out the API",
+                "operationId": "ca",
+                "responses": {
+                    "200": {
+                        "description": "Return a list of resources"
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "login"
+                ],
+                "summary": "Returns a Sample API response",
+                "description": "A sample login to test out the API",
+                "operationId": "greet",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/api/projects/budgets/{project_no}": {
+            "get": {
+                "tags": [
+                    "project_budgets"
+                ],
+                "summary": "Returns a Project Budgets API response",
+                "description": "A sample project budgets to test out the API",
+                "operationId": "budgets",
+                "parameters": [
+                    {
+                        "name": "project_no",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "apiAuth": {
+                "type": "http",
+                "description": "Login with email and password to get the authentication token",
+                "name": "Token based Based",
+                "in": "header",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "login",
+            "description": "first step to user can access this application"
+        },
+        {
+            "name": "project_budgets",
+            "description": "get project budgets"
+        },
+        {
+            "name": "ca",
+            "description": "get  ca"
+        }
+    ]
+}

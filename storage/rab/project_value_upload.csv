@@ -1,0 +1,8 @@
+du_id,site_id,sow,po_line,qty,price,remark,revenue_type
+BKS964,13CRN0152_Q1FL_EXP,Maintance,1234,1,10000000,test upload,1
+BKS964,13CRN0152_MOCN_EXP,Maintance,2134,1,10000000,test upload,2
+,,,,,,,
+Note,(Sebelum upload pastikan note di delete),,,,,,
+Revenue Type:,,,,,,,
+1,Internal,,,,,,
+2,External,,,,,,

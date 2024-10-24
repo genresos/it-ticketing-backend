@@ -1,0 +1,126 @@
+<?php
+
+namespace App\Api\V1\Controllers;
+use JWTAuth;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Dingo\Api\Routing\Helpers;
+use Carbon\Carbon;
+
+
+class CashadvanceSettlementController extends Controller
+{
+    //
+    use Helpers;
+    public function needApproval() {
+
+        $currentUser = JWTAuth::parseToken()->authenticate();
+        
+        $response = [];
+
+        $sql = "SELECT stl.trans_no, stl.reference, ca.reference AS ca_ref,  stl.tran_date,
+                    ca.emp_id, em.name AS employee_name, d.name AS division_name,
+                    stl.amount, stl.approval_amount, stl.ca_amount,
+                    stl.approval_description,cat.name AS ca_type_name,
+                    stld.approval AS approval, stl.ca_trans_no
+                    FROM 0_cashadvance_stl stl
+                    LEFT OUTER JOIN 0_cashadvance_stl_details stld ON (stl.trans_no = stld.trans_no)
+                    LEFT OUTER JOIN 0_cashadvance ca ON (ca.trans_no = stl.ca_trans_no)
+                    LEFT OUTER JOIN 0_cashadvance_types cat ON (ca.ca_type_id = cat.ca_type_id)
+                    LEFT OUTER JOIN 0_projects prj ON (stld.project_no = prj.project_no)
+                    LEFT OUTER JOIN 0_hrm_employees em ON (ca.emp_no = em.id)
+                    LEFT OUTER JOIN 0_hrm_divisions d ON (prj.division_id = d.division_id)
+                    WHERE stl.active=1 ";
+
+        $cashadvances_stl = DB::select( DB::raw($sql));
+
+        
+        foreach ($cashadvances_stl as $cashadvance_stl) {
+           
+            $tmp = [];
+            $tmp['transaction_id'] = $cashadvance_stl->trans_no;
+            $tmp['document_no'] = $cashadvance_stl->reference;
+            $tmp['ca_type'] = $cashadvance_stl->ca_type_name;
+            $tmp['ca_refrence'] = $cashadvance_stl->ca_ref;
+            $tmp['employee'] = $cashadvance_stl->employee_name;
+            $tmp['department'] = $cashadvance_stl->division_name;             
+            
+            $sql = "SELECT 
+                                    stld.*,
+                                    p.project_no,
+                                    p.code AS project_code,
+                                    m.name AS project_manager,
+                                    pct.name AS cost_type_name
+                            FROM 0_cashadvance_stl_details stld 
+                            LEFT JOIN 0_projects p ON (p.project_no = stld.project_no)
+                            LEFT JOIN 0_members m ON (m.person_id = p.person_id)
+                            LEFT JOIN 0_project_cost_type pct ON (pct.cost_type_id = stld.cost_code)
+                            WHERE stld.trans_no = :trans_no";
+
+            $cashadvance_stl_details = DB::select( DB::raw($sql), array(
+                'trans_no' => $cashadvance_stl->trans_no,
+            ));
+
+
+            foreach ($cashadvance_stl_details as $cashadvance_stl_detail) {
+                $items = [];
+                $items['list_id'] = $cashadvance_stl_detail->ca_stl_id;
+                $items['project_id'] = $cashadvance_stl_detail->project_code;
+                $items['project_manager'] = $cashadvance_stl_detail->project_manager;
+                $items['cost_type_name'] = $cashadvance_stl_detail->cost_type_name;
+                $items['remark'] = $cashadvance_stl_detail->remark;
+                $items['amount'] = $cashadvance_stl_detail->amount;
+                $items['approval_amount'] = $cashadvance_stl_detail->approval_amount;
+                $items['status'] = $cashadvance_stl_detail->status_id;                
+                $tmp['stl_list'][] = $items;
+            }
+            
+            array_push($response, $tmp);
+            
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $response
+        ]);
+
+    }
+
+    /*
+     * Get Service Report Today
+     */
+    // public function detail($id) {
+    //     $currentUser = JWTAuth::parseToken()->authenticate();
+    //     $service_reports = DB::table('0_service_report')
+    //     ->leftJoin('0_service_report_type', '0_service_report_type.type_id', '=', '0_service_report.type_id')
+    //     ->leftJoin('0_debtors_master', '0_debtors_master.debtor_no', '=', '0_service_report.debtor_no')        
+    //     ->whereId($id)
+    //     ->select(
+    //             '0_service_report.id',
+    //             '0_service_report_type.name as type_name',
+    //             '0_service_report.title',
+    //             '0_service_report.tran_date as tran_date',
+    //             '0_debtors_master.name as customer',
+    //             '0_service_report.stock_id',
+    //             '0_service_report.problem',
+    //             '0_service_report.created_date',               
+    //             '0_service_report.status_id'
+    //             )      
+    //     ->get();        
+        
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => $service_reports
+    //     ]);
+
+    // }
+
+    // public function update($id) {
+    //     $currentUser = JWTAuth::parseToken()->authenticate();
+
+    // }
+
+
+
+}
