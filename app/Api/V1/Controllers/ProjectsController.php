@@ -116,17 +116,14 @@ class ProjectsController extends Controller
         }
 
 
-        $sql = "SELECT p.*, pt.name as type, dm.name as customer, m.name as project_manager  FROM 0_projects p
-                LEFT JOIN 0_project_types pt ON (p.project_type_id = pt.project_type_id)
-                LEFT JOIN 0_debtors_master dm ON (p.debtor_no = dm.debtor_no) 
-                LEFT JOIN 0_members m ON (p.person_id = m.person_id)";
+        $sql = "SELECT p.* FROM 0_projects p";
 
-        if ($project_code != '') {
-            $sql .= "WHERE p.code LIKE '%$project_code%' OR dm.name LIKE '%$project_code%' OR p.name LIKE '%$project_code%'";
-            $sql .= " ORDER BY p.project_no DESC LIMIT 50";
-        } else {
-            $sql .= " ORDER BY p.project_no DESC LIMIT 24";
-        }
+        // if ($project_code != '') {
+        //     $sql .= "WHERE p.code LIKE '%$project_code%' OR dm.name LIKE '%$project_code%' OR p.name LIKE '%$project_code%'";
+        //     $sql .= " ORDER BY p.project_no DESC LIMIT 50";
+        // } else {
+        //     $sql .= " ORDER BY p.project_no DESC LIMIT 24";
+        // }
 
         $projects = DB::select(DB::raw($sql));
         foreach ($projects as $data) {
@@ -136,11 +133,11 @@ class ProjectsController extends Controller
             $tmp = [];
             $tmp['project_no'] = $data->project_no;
             $tmp['code'] = $data->code;
-            $tmp['name'] = $data->name;
-            $tmp['customer'] = $data->customer;
-            $tmp['type'] = $data->type;
-            $tmp['project_manager'] = $data->project_manager;
-            $tmp['person_id'] = $data->person_id;
+            // $tmp['name'] = $data->name;
+            // $tmp['customer'] = $data->customer;
+            // $tmp['type'] = $data->type;
+            // $tmp['project_manager'] = $data->project_manager;
+            // $tmp['person_id'] = $data->person_id;
 
             array_push($response, $tmp);
         }
@@ -176,7 +173,7 @@ class ProjectsController extends Controller
                     'message' => "Invalid PO number $po_number"
                 ], 500);
             }
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $data
@@ -198,12 +195,12 @@ class ProjectsController extends Controller
         $response['bank_info'] = [];
 
         $po_number = $request->po_number;
-        
+
         $additionalInfo = DB::table('0_purch_orders')->where('reference', $po_number)
             ->join('0_suppliers', '0_suppliers.supplier_id', '=', '0_purch_orders.supplier_id')
             ->select('0_suppliers.bank_account', '0_suppliers.bank_account_name', '0_suppliers.bank_account_beneficiary', '0_purch_orders.spk_no', '0_purch_orders.order_no')
             ->get();
-      
+
         if (!$additionalInfo) {
             return response()->json([
                 'success' => false,

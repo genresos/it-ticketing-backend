@@ -12,13 +12,12 @@ class QueryTickets
         $user_id,
         $user_level
     ) {
-        $sql = "SELECT t.*, u.name AS requestor, tc.name AS category_name, tp.name AS priority_name, ts.name AS status_name, p.code AS project_code
+        $sql = "SELECT t.*, u.name AS requestor, tc.name AS category_name, tp.name AS priority_name, ts.name AS status_name, '' AS project_code
                 FROM 0_ict_tickets t 
                 LEFT JOIN users u ON (t.user_id = u.id)
                 LEFT JOIN 0_ict_ticket_category tc ON (tc.id = t.category_id)
                 LEFT JOIN 0_ict_ticket_priority tp ON (tp.id = t.priority_id)
                 LEFT JOIN 0_ict_ticket_status ts ON (ts.id = t.status_id)
-                LEFT JOIN 0_projects p ON (p.project_no = t.project_no)
                 WHERE t.id != 0 ";
 
         if ($user_level == 999) {
@@ -63,13 +62,12 @@ class QueryTickets
     ) {
         $sql = "SELECT t.*,
                     (SELECT cn.name FROM users cn WHERE cn.id = t.user_id) requestor,
-                    u.name AS assigned_name, tc.name AS category_name, tp.name AS priority_name, ts.name AS status_name, p.code AS project_code 
+                    u.name AS assigned_name, tc.name AS category_name, tp.name AS priority_name, ts.name AS status_name, '' AS project_code 
                     FROM 0_ict_tickets t 
                     LEFT JOIN users u ON (t.assigned_to = u.id)
                     LEFT JOIN 0_ict_ticket_category tc ON (tc.id = t.category_id)
                     LEFT JOIN 0_ict_ticket_priority tp ON (tp.id = t.priority_id)
                     LEFT JOIN 0_ict_ticket_status ts ON (ts.id = t.status_id)
-                    LEFT JOIN 0_projects p ON (p.project_no = t.project_no)
                     WHERE t.id != -1";
 
         if ($user_level != 999) {
@@ -108,13 +106,12 @@ class QueryTickets
     {
         $sql = "SELECT t.*, 
                     (SELECT cn.name FROM users cn WHERE cn.id = t.user_id) requestor,
-                    u.name AS assigned_name, tc.name AS category_name, tp.name AS priority_name, ts.name AS status_name, p.code AS project_code 
+                    u.name AS assigned_name, tc.name AS category_name, tp.name AS priority_name, ts.name AS status_name, '' AS project_code 
                 FROM 0_ict_tickets t 
                 LEFT JOIN users u ON (t.assigned_to = u.id)
                 LEFT JOIN 0_ict_ticket_category tc ON (tc.id = t.category_id)
                 LEFT JOIN 0_ict_ticket_priority tp ON (tp.id = t.priority_id)
                 LEFT JOIN 0_ict_ticket_status ts ON (ts.id = t.status_id)
-                LEFT JOIN 0_projects p ON (p.project_no = t.project_no)
                 WHERE t.id = $id_ticket";
 
         return $sql;
@@ -156,14 +153,13 @@ class QueryTickets
     {
         $time = Carbon::now();
 
-        $sql = "SELECT t.*, u.name AS requestor, us.name AS assigned_name, tc.name AS category_name, tp.name AS priority_name, ts.name AS status_name, p.code AS project_code
+        $sql = "SELECT t.*, u.name AS requestor, us.name AS assigned_name, tc.name AS category_name, tp.name AS priority_name, ts.name AS status_name, '' AS project_code
                 FROM 0_ict_tickets t
                 LEFT JOIN users u ON (t.user_id = u.id)
                 LEFT JOIN users us ON (t.assigned_to = us.id)
                 LEFT JOIN 0_ict_ticket_category tc ON (tc.id = t.category_id)
                 LEFT JOIN 0_ict_ticket_priority tp ON (tp.id = t.priority_id)
                 LEFT JOIN 0_ict_ticket_status ts ON (ts.id = t.status_id)
-                LEFT JOIN 0_projects p ON (p.project_no = t.project_no)
                 WHERE YEAR(t.created_at) = $time->year AND MONTH(t.created_at) = $time->month GROUP BY t.id ORDER BY t.id DESC";
 
         return $sql;
