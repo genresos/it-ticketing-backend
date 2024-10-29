@@ -29,6 +29,7 @@ class Cors
             'http://103.145.151.187/:3001',
             'http://192.168.0.5',
             'http://103.105.66.214:3000',
+            'http://103.165.130.101:3000',
             'http://adyawinsa.com:3000',
             'http://localhost:8000',
             'http://localhost:8080',
