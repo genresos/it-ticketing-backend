@@ -23,7 +23,7 @@ class Cors
             'http://localhost:3223',
             'http://localhost:5173',
             'http://192.168.0.5:3000',
-            'http://192.168.99.230:3000',
+            'http://192.168.0.105:3000',
             'http://192.168.0.5:3001',
             'http://career.adyawinsa.com:3001',
             'http://103.145.151.187/:3001',
