@@ -160,7 +160,7 @@ class ICTTicketController extends Controller
 
         $priority_name = DB::table('0_ict_ticket_priority')->where('id', $tickets_info->priority_id)->first();
         $status_name = DB::table('0_ict_ticket_status')->where('id', $status_id)->first();
-        $category_name = DB::table('0_ict_ticket_category')->where('id', $category_id)->first();
+        $category_name = DB::table('0_ict_ticket_category')->where('id', $tickets_info->category_id)->first();
 
         setlocale(LC_TIME, 'id_ID.UTF-8'); // Mengatur locale ke bahasa Indonesia
         $tanggal = strftime("%d %B %Y %H:%M");

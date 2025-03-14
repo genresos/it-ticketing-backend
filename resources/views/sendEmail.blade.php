@@ -134,8 +134,9 @@
         <div class="email-container">
             <!-- Ticket Header -->
             <div class="ticket-header">
-                <h2>Hallo {{ $ticketData['ticket_id'] }}</h2>
-                <p>Your ticket has been {{ $ticketData['ticket_status_text'] }}.</p>
+                <h2>{{ $ticketData['ticket_status_text'] == 'Closed' ? 'Thank you' : 'Hallo' }} {{ $ticketData['ticket_id'] }}</h2>
+                <p><strong>Your ticket has been {{ $ticketData['ticket_status_text'] }}.</strong></p>
+
             </div>
 
             <!-- Ticket Status -->
