@@ -8,6 +8,8 @@ use App\Http\Controllers\TicketsController;
 use Illuminate\Http\Request;
 use Auth;
 use App\Modules\PaginationArr;
+use App\Mail\MailNotify;
+use Illuminate\Support\Facades\DB;
 
 class ICTTicketController extends Controller
 {
@@ -19,6 +21,8 @@ class ICTTicketController extends Controller
         $this->user_id = Auth::guard()->user()->id;
         $this->user_level = Auth::guard()->user()->approval_level;
         $this->user_division = Auth::guard()->user()->division_id;
+        $this->user_name = Auth::guard()->user()->name;
+        $this->user_email = Auth::guard()->user()->email;
     }
     public function get_tickets(Request $request)
     {
@@ -95,6 +99,8 @@ class ICTTicketController extends Controller
 
     public function create_tickets(Request $request)
     {
+        setlocale(LC_TIME, 'id_ID.UTF-8'); // Mengatur locale ke bahasa Indonesia
+        $tanggal = strftime("%d %B %Y %H:%M");
         $assigned = "$request->assigned_1,$request->assigned_2,$request->assigned_3";
         $title = $request->title;
         $description = $request->description;
@@ -111,6 +117,20 @@ class ICTTicketController extends Controller
             $project_no,
             $this->user_id
         );
+
+        $priority_name = DB::table('0_ict_ticket_priority')->where('id', $priority_id)->first();
+
+        $ticketData = [
+            'ticket_id' => $this->user_name,
+            'ticket_created_at' => $tanggal,
+            'ticket_status' => 'created', // created, assigned, closed
+            'ticket_status_text' => 'Created',
+            'ticket_subject' =>  $request->title,
+            'ticket_description' => $request->description,
+            'ticket_priority' => $priority_name->name,
+            'ticket_assigned_to' => '-',
+        ];
+        \Mail::to($this->user_email)->send(new \App\Mail\MailNotify($ticketData));
         return $myQuery;
     }
 

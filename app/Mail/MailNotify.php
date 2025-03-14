@@ -11,18 +11,18 @@ class MailNotify extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $details;
-    
+    public $ticketData;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($details)
+    public function __construct($ticketData)
     {
-        $this->details = $details;
+        $this->ticketData = $ticketData;
     }
-  
+
     /**
      * Build the message.
      *
@@ -30,8 +30,8 @@ class MailNotify extends Mailable
      */
     public function build()
     {
-       
-        return $this->subject('Registration Code')
-                    ->view('sendEmail');
+
+        return $this->subject('Ticketing Support')
+            ->view('sendEmail');
     }
 }
