@@ -99,8 +99,7 @@ class ICTTicketController extends Controller
 
     public function create_tickets(Request $request)
     {
-        setlocale(LC_TIME, 'id_ID.UTF-8'); // Mengatur locale ke bahasa Indonesia
-        $tanggal = strftime("%d %B %Y %H:%M");
+
         $assigned = "$request->assigned_1,$request->assigned_2,$request->assigned_3";
         $title = $request->title;
         $description = $request->description;
@@ -119,7 +118,8 @@ class ICTTicketController extends Controller
         );
 
         $priority_name = DB::table('0_ict_ticket_priority')->where('id', $priority_id)->first();
-
+        setlocale(LC_TIME, 'id_ID.UTF-8'); // Mengatur locale ke bahasa Indonesia
+        $tanggal = strftime("%d %B %Y %H:%M");
         $ticketData = [
             'ticket_id' => $this->user_name,
             'ticket_created_at' => $tanggal,
@@ -129,6 +129,8 @@ class ICTTicketController extends Controller
             'ticket_description' => $request->description,
             'ticket_priority' => $priority_name->name,
             'ticket_assigned_to' => '-',
+            'ticket_category' => '-',
+            'ticket_note' => '-',
         ];
         \Mail::to($this->user_email)->send(new \App\Mail\MailNotify($ticketData));
         return $myQuery;
@@ -148,6 +150,33 @@ class ICTTicketController extends Controller
             $comment,
             $this->user_id
         );
+
+
+        $tickets_info = DB::table('0_ict_tickets as t')
+            ->leftJoin('users as u', 't.user_id', '=', 'u.id')
+            ->select('t.*', 'u.name as name_creator', 'u.email as email_creator')
+            ->where('t.id', $id)
+            ->first();
+
+        $priority_name = DB::table('0_ict_ticket_priority')->where('id', $tickets_info->priority_id)->first();
+        $status_name = DB::table('0_ict_ticket_status')->where('id', $status_id)->first();
+        $category_name = DB::table('0_ict_ticket_category')->where('id', $category_id)->first();
+
+        setlocale(LC_TIME, 'id_ID.UTF-8'); // Mengatur locale ke bahasa Indonesia
+        $tanggal = strftime("%d %B %Y %H:%M");
+        $ticketData = [
+            'ticket_id' => $tickets_info->name_creator,
+            'ticket_created_at' => $tanggal,
+            'ticket_status' => 'created', // created, assigned, closed
+            'ticket_status_text' => $status_name->name,
+            'ticket_subject' =>  $tickets_info->title,
+            'ticket_description' => $tickets_info->description,
+            'ticket_priority' => $priority_name->name,
+            'ticket_assigned_to' => $this->user_name,
+            'ticket_category' => $category_name->name,
+            'ticket_note' => $comment,
+        ];
+        \Mail::to($tickets_info->email_creator)->send(new \App\Mail\MailNotify($ticketData));
         return $myQuery;
     }
 
